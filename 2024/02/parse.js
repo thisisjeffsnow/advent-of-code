@@ -50,6 +50,8 @@ rl.on("line", (line) => {
 
   if (isSafeReport(counts.pos, counts.neg, counts.unsafe)) {
     safeReports++;
+    safeReportsWithDampener++; // safe reports are safe with dampening
+    return;
   }
 
   // Part 2: Does removing a report make that level safe?
