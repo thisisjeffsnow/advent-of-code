@@ -12,7 +12,7 @@ const rl = readline.createInterface({
 let safeReports = 0;
 let safeReportsWithDampener = 0;
 
-/* |x - y| - 1 <= 2 is equivalent to 1 <= |x - y| <= 3 */
+/* ||x - y| - 1| <= 2 is equivalent to 1 <= |x - y| <= 3 */
 const isSafeDiff = (x, y) => Math.abs(Math.abs(x - y) - 1) <= 2;
 
 const isSafeReport = (posDiffs, negDiffs, unsafeDiffs) => {
