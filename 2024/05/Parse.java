@@ -98,11 +98,24 @@ public class Parse {
         // System.out.println(key + " node connects to " + graph.get(key));
         // }
 
-        // Now, let's test a sort to see if it's valid.
-        String[] firstSort = sorts.get(0);
-        boolean isValid = isValidSort(firstSort, graph);
-        System.out.println("\nFirst sort is " + (isValid ? "valid" : "invalid"));
-        // :( NullPointerException here, need to figure out why, lunch break)
+        // Go through our sorts and determine validity. [PART 1]
+        List<String> goodSorts = new ArrayList<>();
+        List<String> middles = new ArrayList<>();
+        int middleSum = 0;
 
+        for (String[] sort : sorts) {
+            boolean isValid = isValidSort(sort, graph);
+
+            if (isValid) {
+                goodSorts.add(Arrays.toString(sort));
+                String middle = sort[sort.length / 2];
+                middles.add(middle);
+                middleSum += Integer.parseInt(middle);
+            }
+        }
+
+        // Stats
+        System.out.println("Middle elements of valid sorts: " + middles);
+        System.out.println("Sum of middles: " + middleSum);
     }
 }
