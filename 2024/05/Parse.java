@@ -35,6 +35,28 @@ public class Parse {
         return true;
     }
 
+    private static void fixBadSort(String[] badSort, Map<String, List<String>> graph) {
+        // Filter out rules so that we only have a rules that apply to our sort
+        // and make a new graph from only those rules.
+        Map<String, List<String>> smallGraph = new HashMap<>();
+        for (String node : badSort) {
+            if (graph.containsKey(node)) {
+                smallGraph.put(node, new ArrayList<>());
+                for (String neighbor : graph.get(node)) {
+                    if (Arrays.asList(badSort).contains(neighbor)) {
+                        smallGraph.get(node).add(neighbor);
+                    }
+                }
+            }
+        }
+
+        // Test we only see the rules for that sort.
+        System.out.println("smallGraph for sort: " + Arrays.toString(badSort));
+        for (String key : smallGraph.keySet()) {
+            System.out.println(key + " -> " + smallGraph.get(key));
+        }
+    }
+
     public static void main(String[] args) {
         String inputFile = "input.txt";
 
@@ -116,10 +138,8 @@ public class Parse {
                 // New logic for invalid sorts [Part 2]
                 // Test to see output.
                 System.out.println("Invalid sort: " + Arrays.toString(sort));
-                // Call a function to process the invalid sort
-                // Would look something like this?
-                // String middle = handleInvalidSort(sort, graph);
-                // System.out.println("Middle of corrected order: " + middle);
+
+                fixBadSort(sort, graph); // Show rules graph from this sort.
             }
         }
 
