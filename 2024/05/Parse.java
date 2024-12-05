@@ -21,11 +21,11 @@ public class Parse {
             while ((line = buffy.readLine()) != null) {
                 if (line.contains("|")) {
                     // Split A|B into [A, B] and add to rules
-                    String[] rule = line.split("\\|");
+                    String[] rule = line.trim().split("\\|");
                     rules.add(rule);
                 } else if (line.contains(",")) {
                     // Split A,B,C... into [A, B, C, ...] and add to sorts
-                    String[] sort = line.split(",");
+                    String[] sort = line.trim().split(",");
                     sorts.add(sort);
                 }
             }
@@ -34,14 +34,36 @@ public class Parse {
         }
 
         // Make sure we can see the rules and sorts and have stored them.
-        System.out.println("Rules:");
+        // System.out.println("Rules:");
+        // for (String[] rule : rules) {
+        //     System.out.println(Arrays.toString(rule));
+        // }
+
+        // System.out.println("\nSorts:");
+        // for (String[] sort : sorts) {
+        //     System.out.println(Arrays.toString(sort));
+        // }
+
+        // Build graph from our rules
+        Map<String, List<String>> graph = new HashMap<>();
+
         for (String[] rule : rules) {
-            System.out.println(Arrays.toString(rule));
+            // LEFT|RIGHT => [Left < Right]
+            String left = rule[0];
+            String right = rule[1];
+
+            graph.putIfAbsent(left, new ArrayList<>());
+
+            graph.get(left).add(right);
+
+            graph.putIfAbsent(right, new ArrayList<>());
         }
 
-        System.out.println("\nSorts:");
-        for (String[] sort : sorts) {
-            System.out.println(Arrays.toString(sort));
+        // Test graph output:
+        System.out.println("\nGraph:");
+        for (String key : graph.keySet()) {
+            System.out.println(key + " node connects to " + graph.get(key));
         }
+
     }
 }
