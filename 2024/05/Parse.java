@@ -5,22 +5,33 @@ public class Parse {
 
     // Checking that a given 'sort' (group of pages) is valid to the rules graph
     private static boolean isValidSort(String[] sort, Map<String, List<String>> graph) {
-        // map each page to its position in the sort
+        // Map each page to its position in the sort
         Map<String, Integer> placeholders = new HashMap<>();
         for (int i = 0; i < sort.length; i++) {
             placeholders.put(sort[i], i);
         }
 
-        // then check all the rules to make sure all rules are applied correctly
-        // to the sort
-        for (String node : graph.keySet()) {
+        // Avoid null pointer here by only checking rules that exist in the current
+        // sorting of pages.
+        for (String node : sort) {
+            // If we have no mention of rules with that page, we don't care.
+            if (!graph.containsKey(node)) {
+                continue;
+            }
+
             for (String neighbor : graph.get(node)) {
-                // If the neighbor appears before the node, the sort is invalid
+                // If the rule applies to pages we're not even encountering, we also don't care.
+                if (!placeholders.containsKey(neighbor)) {
+                    continue;
+                }
+
+                // If the page in the sort violates a rule, fail.
                 if (placeholders.get(node) > placeholders.get(neighbor)) {
                     return false;
                 }
             }
         }
+
         return true;
     }
 
