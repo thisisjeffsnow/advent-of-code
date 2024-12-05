@@ -35,7 +35,7 @@ public class Parse {
         return true;
     }
 
-    private static void fixBadSort(String[] badSort, Map<String, List<String>> graph) {
+    private static List<String> fixBadSort(String[] badSort, Map<String, List<String>> graph) {
         // Filter out rules so that we only have a rules that apply to our sort
         // and make a new graph from only those rules.
         Map<String, List<String>> smallGraph = new HashMap<>();
@@ -50,11 +50,30 @@ public class Parse {
             }
         }
 
-        // Test we only see the rules for that sort.
-        System.out.println("smallGraph for sort: " + Arrays.toString(badSort));
-        for (String key : smallGraph.keySet()) {
-            System.out.println(key + " -> " + smallGraph.get(key));
+        Set<String> processed = new HashSet<>();
+        Stack<String> fixedSort = new Stack<>();
+
+        // Recursively get the order of the pages from the rules relevant to the pages
+        for (String node : smallGraph.keySet()) {
+            if (!processed.contains(node)) {
+                dfs(node, smallGraph, processed, fixedSort);
+            }
         }
+
+        return new ArrayList<>(fixedSort);
+    }
+
+    // helper for dfs fixing bad sorts
+    private static void dfs(String node, Map<String, List<String>> graph, Set<String> processed, Stack<String> result) {
+        processed.add(node);
+
+        for (String neighbor : graph.getOrDefault(node, new ArrayList<>())) {
+            if (!processed.contains(neighbor)) {
+                dfs(neighbor, graph, processed, result);
+            }
+        }
+
+        result.push(node);
     }
 
     public static void main(String[] args) {
@@ -122,8 +141,12 @@ public class Parse {
 
         // Go through our sorts and determine validity.
         List<String> goodSorts = new ArrayList<>();
-        List<String> middles = new ArrayList<>();
-        int middleSum = 0;
+        List<String> goodMiddles = new ArrayList<>();
+        int goodMiddlesSum = 0;
+
+        List<String> badSorts = new ArrayList<>();
+        List<String> badMiddles = new ArrayList<>();
+        int badMiddlesSum = 0;
 
         for (String[] sort : sorts) {
             boolean isValid = isValidSort(sort, graph);
@@ -132,19 +155,24 @@ public class Parse {
                 // Existing logic for valid sorts [Part 1]
                 goodSorts.add(Arrays.toString(sort));
                 String middle = sort[sort.length / 2];
-                middles.add(middle);
-                middleSum += Integer.parseInt(middle);
+                goodMiddles.add(middle);
+                goodMiddlesSum += Integer.parseInt(middle);
             } else {
                 // New logic for invalid sorts [Part 2]
                 // Test to see output.
-                System.out.println("Invalid sort: " + Arrays.toString(sort));
-
-                fixBadSort(sort, graph); // Show rules graph from this sort.
+                // System.out.println("Invalid sort: " + Arrays.toString(sort));
+                // fixBadSort(sort, graph); // Show rules graph from this sort.
+                badSorts.add(Arrays.toString(sort));
+                List<String> fixedSort = fixBadSort(sort, graph);
+                String middle = fixedSort.get(fixedSort.size() / 2);
+                badMiddles.add(middle);
+                badMiddlesSum += Integer.parseInt(middle);
             }
         }
 
         // Stats
         // System.out.println("Middle elements of valid sorts: " + middles);
-        System.out.println("[P1] Sum of middles: " + middleSum);
+        System.out.println("[P1] Sum of good middles: " + goodMiddlesSum);
+        System.out.println("[P2] Sum of bad middles: " + badMiddlesSum);
     }
 }
