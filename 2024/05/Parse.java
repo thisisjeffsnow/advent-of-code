@@ -98,7 +98,7 @@ public class Parse {
         // System.out.println(key + " node connects to " + graph.get(key));
         // }
 
-        // Go through our sorts and determine validity. [PART 1]
+        // Go through our sorts and determine validity.
         List<String> goodSorts = new ArrayList<>();
         List<String> middles = new ArrayList<>();
         int middleSum = 0;
@@ -107,15 +107,24 @@ public class Parse {
             boolean isValid = isValidSort(sort, graph);
 
             if (isValid) {
+                // Existing logic for valid sorts [Part 1]
                 goodSorts.add(Arrays.toString(sort));
                 String middle = sort[sort.length / 2];
                 middles.add(middle);
                 middleSum += Integer.parseInt(middle);
+            } else {
+                // New logic for invalid sorts [Part 2]
+                // Test to see output.
+                System.out.println("Invalid sort: " + Arrays.toString(sort));
+                // Call a function to process the invalid sort
+                // Would look something like this?
+                // String middle = handleInvalidSort(sort, graph);
+                // System.out.println("Middle of corrected order: " + middle);
             }
         }
 
         // Stats
-        System.out.println("Middle elements of valid sorts: " + middles);
-        System.out.println("Sum of middles: " + middleSum);
+        // System.out.println("Middle elements of valid sorts: " + middles);
+        System.out.println("[P1] Sum of middles: " + middleSum);
     }
 }
