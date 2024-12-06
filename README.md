@@ -1,6 +1,6 @@
 # Advent of Code 2024 🎄
 
-## Solutions for [Advent of Code 2024](https://adventofcode.com/2024), written in a variety of programming languages, in descending order of comfort level or perceived difficulty with that language. Each day's folder contains my approach to the puzzles, showcasing different languages and techniques.
+## Solutions for [Advent of Code 2024](https://adventofcode.com/2024), written in a variety of programming languages, in descending order of comfort level or perceived ease of use with that language. Each day's folder contains my approach to the puzzles, showcasing different languages and techniques.
 
 ## Structure (Example)
 
