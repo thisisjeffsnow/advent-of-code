@@ -6,64 +6,41 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Basic code first. Can we grab all the rows?
-        string[] map = File.ReadAllLines("input.txt");
+        // Grab file rows
+        string[] rows = File.ReadAllLines("input.txt");
 
-        // Can we print all the rows?
-        // foreach (string row in rows)
-        // {
-        //     Console.WriteLine(row);
-        // }
+        int mapH = rows.Length;
+        int mapW = rows[0].Length;
 
-        // Alright, make the map a 2D array for all the characters
-        // We see the rows are all the same length (we'll assume that's the case)
-        // int mapH = rows.Length;
-        // int mapW = rows[0].Length;
-        // char[,] map = new char[mapH, mapW];
 
-        // for(int y = 0; y < mapH; ++y) {
-        //     for(int x = 0; x < mapW; ++x) {
-        //         map[x, y] = rows[]
-        //     }
-        // }
+        // Move rows to a writable map, find all obstacles and find start
+        List<(int x, int y)> obstacles = new List<(int x, int y)>();
 
-        int mapH = map.Length;
-        int mapW = map[0].Length;
-
-        // Okay, good, find all obstacles and find start
         int currX = -1;
         int currY = -1;
 
-        // It's already a 2D array. Print using x and y to test:
-        // Find the start?
-        // List to track obstacle positions
-        List<(int x, int y)> obstacles = new List<(int x, int y)>();
+        char[][] map = new char[mapH][];
+        for (int i = 0; i < mapH; i++)
+        {
+            map[i] = new char[mapW];
+        }
 
-        // Iterate over the map
         for (int y = 0; y < mapH; ++y)
         {
             for (int x = 0; x < mapW; ++x)
             {
-                if (map[y][x] == '^') // Find start
+                if (rows[y][x] == '^') // Find start
                 {
                     currX = x;
                     currY = y;
                 }
-                else if (map[y][x] == '#') // Find obstacles
+                else if (rows[y][x] == '#') // Find obstacles
                 {
                     obstacles.Add((x, y));
                 }
+                map[y][x] = rows[y][x];
             }
         }
-
-        // if (currX != -1 && currY != -1)
-        // {
-        //     Console.WriteLine($"Start found at: ({currX}, {currY})");
-        // }
-        // else
-        // {
-        //     Console.WriteLine("Start symbol '^' not found.");
-        // }
 
         int[][] dirs = new int[4][];
         dirs[0] = new int[] { -1, 0 }; // north Y - 1, X
@@ -81,7 +58,11 @@ class Program
         int visited = 0;
         while (!done)
         {
-            ++visited;
+            if (map[currY][currX] != 'X')
+            {
+                ++visited;
+                map[currY][currX] = 'X';
+            }
 
             // What is our next move?
             int nextY = currY + dirs[currDirIndex][0];
@@ -99,12 +80,12 @@ class Program
             {
                 currDirIndex = (currDirIndex + 1) % dirMod;
             }
-
-            // just loops forever? lol what
-            Console.WriteLine("Currently at: " + currX + ", " + currY + "\n");
-            currX = nextX;
-            currY = nextY;
-
+            else
+            {
+                Console.WriteLine("Currently at: " + currX + ", " + currY + "\n");
+                currX = nextX;
+                currY = nextY;
+            }
         }
 
         Console.WriteLine("Spots visited: " + visited);
