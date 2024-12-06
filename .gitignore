@@ -1,2 +1,5 @@
 input.txt
 *.class
+*.sln
+obj/
+bin/
