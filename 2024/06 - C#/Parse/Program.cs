@@ -12,9 +12,12 @@ class Program
         int mapH = rows.Length;
         int mapW = rows[0].Length;
 
-
         // Move rows to a writable map, find all obstacles and find start
         List<(int x, int y)> obstacles = new List<(int x, int y)>();
+
+        // Going to map obstacles by row and column too for Part 2.
+        Dictionary<int, List<(int x, int y)>> obstaclesByRow = new Dictionary<int, List<(int x, int y)>>();
+        Dictionary<int, List<(int x, int y)>> obstaclesByCol = new Dictionary<int, List<(int x, int y)>>();
 
         int currX = -1;
         int currY = -1;
@@ -37,10 +40,22 @@ class Program
                 else if (rows[y][x] == '#') // Find obstacles
                 {
                     obstacles.Add((x, y));
+                    if (!obstaclesByRow.ContainsKey(y))
+                    {
+                        obstaclesByRow[y] = new List<(int x, int y)>();
+                    }
+                    obstaclesByRow[y].Add((x, y));
+
+                    if (!obstaclesByCol.ContainsKey(x))
+                    {
+                        obstaclesByCol[x] = new List<(int x, int y)>();
+                    }
+                    obstaclesByCol[x].Add((x, y));
                 }
                 map[y][x] = rows[y][x];
             }
         }
+
 
         int[][] dirs = new int[4][];
         dirs[0] = new int[] { -1, 0 }; // north Y - 1, X
@@ -89,6 +104,20 @@ class Program
         }
 
         Console.WriteLine("Spots visited: " + visited);
+
+        // Check we can print obstacles by row and col:
+        Console.WriteLine("Rows:");
+        foreach (var row in obstaclesByRow)
+        {
+            Console.WriteLine($"Row {row.Key}: {string.Join(", ", row.Value)}");
+        }
+
+        // Print encountered obstacles by column
+        Console.WriteLine("Cols:");
+        foreach (var col in obstaclesByCol)
+        {
+            Console.WriteLine($"Column {col.Key}: {string.Join(", ", col.Value)}");
+        }
     }
 
 }
