@@ -54,17 +54,38 @@ int main() {
         // Move to the right hand side of the colon, past the string terminator.
         char *rightSide = colonIndex + 1;
 
-        // All of them have spaces between them, so split them.
+        // // All of them have spaces between them, so split them.
+
+        // For one number:
+        // char *piece = strtok(rightSide, " ");
+        // if(piece != NULL) {
+        //     uint64_t rightNumber = strtoull(piece, NULL, 10);
+        //     printf("Right number = %" PRIu64 "\n", rightNumber);
+        //     printf("**********\n\n");
+        // } else {
+        //     perror("Couldn't grab number on the right. Failure.");
+        //     fclose(fp);
+        //     return 1;
+        // }
+
+        // For all numbers on the right:
+        uint64_t rightNumbers[LINE_SIZE]; // Very big, but sufficient to hold our numbers in the line.
+        // We could theoretically hold every character in the line, let alone spaced out numbers.
+        // Find out a better way to do this? Run the line and count spaces to determine array size?
+        // Allocate dynamically and expand array when we get close to filling it? 
+        // Stuff to think about.
+        
+        size_t currIndex = 0;
+
         char *piece = strtok(rightSide, " ");
-        if(piece != NULL) {
-            uint64_t rightNumber = strtoull(piece, NULL, 10);
-            printf("Right number = %" PRIu64 "\n", rightNumber);
-            printf("**********\n\n");
-        } else {
-            perror("Couldn't grab number on the right. Failure.");
-            fclose(fp);
-            return 1;
+        while(piece != NULL) {
+            rightNumbers[currIndex] = strtoull(piece, NULL, 10);
+            printf("Grabbed a number! %zu => %" PRIu64 "\n", currIndex, rightNumbers[currIndex]);
+            currIndex++;
+            piece = strtok(NULL, " ");
         }
+        
+
 
 
 
