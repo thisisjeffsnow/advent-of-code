@@ -29,7 +29,7 @@ int main() {
         size_t lineLength = strlen(lp);
         bytesRead += lineLength;
         printf("Got a line = %s", lp);
-        printf("Line length = %zu\n", lineLength);
+        //printf("Line length = %zu\n", lineLength);
 
         // Alright, I figured out how to grab lines. Can we separate the numbers?
         // AAAA: B C D E F G .....
@@ -48,7 +48,23 @@ int main() {
         uint64_t leftNumber = strtoull(lp, NULL, 10); 
         // Test
         printf("Left Number = %" PRIu64 "\n", leftNumber);
-        printf("**********\n\n");
+        // printf("**********\n\n");
+
+        // Alright, let's get the rest of them.
+        // Move to the right hand side of the colon, past the string terminator.
+        char *rightSide = colonIndex + 1;
+
+        // All of them have spaces between them, so split them.
+        char *piece = strtok(rightSide, " ");
+        if(piece != NULL) {
+            uint64_t rightNumber = strtoull(piece, NULL, 10);
+            printf("Right number = %" PRIu64 "\n", rightNumber);
+            printf("**********\n\n");
+        } else {
+            perror("Couldn't grab number on the right. Failure.");
+            fclose(fp);
+            return 1;
+        }
 
 
 
