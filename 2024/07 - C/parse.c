@@ -4,16 +4,12 @@
 #include <inttypes.h>
 
 #define FILE_NAME "input.txt"
-#define LINE_SIZE 1024 // Puzzle lines don't exceed this size.
-// Probably better to dyanmically figure out the longest line. This
-// might be a security problem if it was used in a real project. I'm not sure.
-// It would be worth investigating though.
+#define LINE_SIZE 1024 // Max size of a line in the input file.
 
-// Problem 2 concatenate operator
+// Problem 2: Concatenate operator
 uint64_t concatenate(uint64_t left, uint64_t right)
 {
-    // Again, I'm using LINE_SIZE here because I know it's of sufficient size for this problem.
-    // But, I'm sure there are better ways to do this.
+    // Convert numbers to strings and concatenate them.
     char leftBuffer[LINE_SIZE];
     char rightBuffer[LINE_SIZE];
     snprintf(leftBuffer, LINE_SIZE, "%" PRIu64, left);
@@ -24,31 +20,30 @@ uint64_t concatenate(uint64_t left, uint64_t right)
     return strtoull(leftBuffer, NULL, 10);
 }
 
-// DFS Helper for checking all adding and multiplying combinations once we grab all our numbers.
+// DFS Helper: Recursively evaluate combinations of +, *, and || to match the left number.
 int dfs(uint64_t *rightNumbers, size_t rightNumbersSize, size_t currIndex, uint64_t currentCalculation, uint64_t leftNumber, int problemNumber)
 {
-    // Base Case = We have exhausted all the numbers on the right side, now check that the calcuation is good or not.
+    // Base case: If all numbers on the right are used, check if the calculation matches the left number.
     if (currIndex == rightNumbersSize)
     {
         return currentCalculation == leftNumber;
     }
 
-    // Recursion, we need to check addition and multiplication.
     uint64_t nextRightNumber = rightNumbers[currIndex];
 
-    // Add
+    // Try addition
     if (dfs(rightNumbers, rightNumbersSize, currIndex + 1, currentCalculation + nextRightNumber, leftNumber, problemNumber))
     {
         return 1;
     }
 
-    // Multiply
+    // Try multiplication
     if (dfs(rightNumbers, rightNumbersSize, currIndex + 1, currentCalculation * nextRightNumber, leftNumber, problemNumber))
     {
         return 1;
     }
 
-    // Concatenate (Only for part 2)
+    // Try concatenation (only for Part 2)
     if (problemNumber == 2)
     {
         uint64_t concatenated = concatenate(currentCalculation, nextRightNumber);
@@ -73,7 +68,7 @@ int main()
     char *lp = malloc(LINE_SIZE);
     if (lp == NULL)
     {
-        perror("Couldn't create a line pointer.");
+        perror("Couldn't allocate memory for line pointer.");
         fclose(fp);
         return 1;
     }
@@ -86,85 +81,54 @@ int main()
     {
         size_t lineLength = strlen(lp);
         bytesRead += lineLength;
-        printf("Got a line = %s", lp);
-        // printf("Line length = %zu\n", lineLength);
 
-        // Alright, I figured out how to grab lines. Can we separate the numbers?
-        // AAAA: B C D E F G .....
-
-        // Find the colon.
+        // Find the colon to separate the left and right parts of the line.
         char *colonIndex = strchr(lp, ':');
         if (colonIndex == NULL)
         {
-            perror("Found a line without a colon. Exiting.");
+            perror("Line missing a colon. Exiting.");
             fclose(fp);
+            free(lp);
             return 1;
         }
 
-        // Grab the left number. Change the colon to string terminator.
+        // Extract the left number (before the colon).
         *colonIndex = '\0';
-        // Puzzle shows that the left number is always positive, so use unsigned and a big storage for number.
         uint64_t leftNumber = strtoull(lp, NULL, 10);
-        // Test
-        printf("Left Number = %" PRIu64 "\n", leftNumber);
-        // printf("**********\n\n");
 
-        // Alright, let's get the rest of them.
-        // Move to the right hand side of the colon, past the string terminator.
+        // Extract the right numbers (after the colon).
         char *rightSide = colonIndex + 1;
 
-        // // All of them have spaces between them, so split them.
-
-        // For one number:
-        // char *piece = strtok(rightSide, " ");
-        // if(piece != NULL) {
-        //     uint64_t rightNumber = strtoull(piece, NULL, 10);
-        //     printf("Right number = %" PRIu64 "\n", rightNumber);
-        //     printf("**********\n\n");
-        // } else {
-        //     perror("Couldn't grab number on the right. Failure.");
-        //     fclose(fp);
-        //     return 1;
-        // }
-
-        // For all numbers on the right:
-        uint64_t rightNumbers[LINE_SIZE]; // Very big, but sufficient to hold our numbers in the line.
-        // We could theoretically hold every character in the line, let alone spaced out numbers.
-        // Find out a better way to do this? Run the line and count spaces to determine array size?
-        // Allocate dynamically and expand array when we get close to filling it?
-        // Stuff to think about.
-
+        // Parse the right-hand numbers into an array.
+        uint64_t rightNumbers[LINE_SIZE];
         size_t currIndex = 0;
 
         char *piece = strtok(rightSide, " ");
         while (piece != NULL)
         {
             rightNumbers[currIndex] = strtoull(piece, NULL, 10);
-            printf("Grabbed a number! %zu => %" PRIu64 "\n", currIndex, rightNumbers[currIndex]);
             currIndex++;
             piece = strtok(NULL, " ");
         }
 
-        // Now check for solutions. Adding and multiplying our numbers on the right should result in the left number.
-        // If there are no numbers on the right, do nothing.
+        // Solve for Part 1 and Part 2 if there are numbers on the right.
         if (currIndex > 0)
         {
             if (dfs(rightNumbers, currIndex, 1, rightNumbers[0], leftNumber, 1))
             {
-                printf("Solution1 found! %" PRIu64 "\n", leftNumber);
                 p1Solution += leftNumber;
             }
             if (dfs(rightNumbers, currIndex, 1, rightNumbers[0], leftNumber, 2))
             {
-                printf("Solution2 found! %" PRIu64 "\n", leftNumber);
                 p2Solution += leftNumber;
             }
         }
     }
 
+    // Output results
     printf("Bytes Read = %zu\n", bytesRead);
-    printf("P1 Solution = %" PRIu64 "\n", p1Solution);
-    printf("P2 Solution = %" PRIu64 "\n", p2Solution);
+    printf("Part 1 Solution = %" PRIu64 "\n", p1Solution);
+    printf("Part 2 Solution = %" PRIu64 "\n", p2Solution);
 
     free(lp);
     fclose(fp);
