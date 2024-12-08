@@ -3,3 +3,4 @@ input.txt
 *.sln
 obj/
 bin/
+parse
